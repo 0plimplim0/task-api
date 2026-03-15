@@ -16,7 +16,7 @@ func InitRepository() *Repository {
 
 func (rep *Repository) InsertExamples() {
 	rep.lock.Lock()
-	defer rep.lock.RUnlock()
+	defer rep.lock.Unlock()
 	rep.tasks = append(rep.tasks,
 		Task{Id: 1, Title: "Task 1", Description: "Example task 1", Completed: false},
 		Task{Id: 2, Title: "Task 2", Description: "Example task 2", Completed: false},
@@ -47,10 +47,26 @@ func (rep *Repository) addTask(task Task) {
 	rep.tasks = append(rep.tasks, task)
 }
 
-func (rep *Repository) updateTask(id int) error {
-	return nil
+func (rep *Repository) updateTask(id int, task Task) error {
+	rep.lock.Lock()
+	defer rep.lock.Unlock()
+	for i, v := range rep.tasks {
+		if v.Id == id {
+			rep.tasks[i] = task
+			return nil
+		}
+	}
+	return errors.New("Task not found")
 }
 
 func (rep *Repository) deleteTask(id int) error {
-	return nil
+	rep.lock.Lock()
+	defer rep.lock.Unlock()
+	for i, v := range rep.tasks {
+		if v.Id == id {
+			rep.tasks = append(rep.tasks[:i], rep.tasks[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("Task not found")
 }

@@ -51,12 +51,45 @@ func AddTask(rep *Repository) http.HandlerFunc {
 
 func UpdateTask(rep *Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
+		}
+		var task Task
+		jsonErr := json.NewDecoder(r.Body).Decode(&task)
+		if jsonErr != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+		err = rep.updateTask(id, task)
+		if err != nil {
+			http.Error(w, "Task not found", http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
 func DeleteTask(rep *Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
+		}
+		err = rep.deleteTask(id)
+		if err != nil {
+			http.Error(w, "Task not found", http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
+
+// TODOS:
+// - Add validation for empty json in post
+// - Add validation for empty fields
+// - Add validation for POST to existing ids
+// - Add validation for Content-Type (if not then 415 Unsupported Media Type)
+// - Add DoS protection with http.MaxBytesReader
