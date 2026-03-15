@@ -23,7 +23,7 @@ Simple REST API for managing tasks.
 ### Task
 ```json
 {
-  "id":"string",
+  "id":8,
   "title":"string",
   "description":"string",
   "completed":false
