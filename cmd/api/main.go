@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"task-api/internal/todo"
 	"time"
 )
 
 func main() {
 
-	mux := setRouter()
+	rep := todo.InitRepository()
+
+	mux := setRouter(rep)
+	todo.InsertExamples(rep)
 
 	srv := &http.Server{
 		Addr:         ":8080",
