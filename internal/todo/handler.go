@@ -11,42 +11,52 @@ func Greeting(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hi! Welcome to my server!")
 }
 
-func GetAllTasks(w http.ResponseWriter, r *http.Request, rep *Repository) {
-	tasks := getTasks(rep)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tasks)
-}
-
-func GetTaskById(w http.ResponseWriter, r *http.Request, rep *Repository) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
+func GetAllTasks(rep *Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tasks := rep.getTasks()
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(tasks)
 	}
-	err, task := getTask(id, rep)
-	if err != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
-		return
+}
+
+func GetTaskById(rep *Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
+		}
+		err, task := rep.getTask(id)
+		if err != nil {
+			http.Error(w, "Task not found", http.StatusNotFound)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(task)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
 }
 
-func AddTask(w http.ResponseWriter, r *http.Request, rep *Repository) {
-	var task Task
-	err := json.NewDecoder(r.Body).Decode(&task)
-	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
+func AddTask(rep *Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var task Task
+		err := json.NewDecoder(r.Body).Decode(&task)
+		if err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+		rep.addTask(task)
+		w.WriteHeader(http.StatusCreated)
 	}
-	addTask(task, rep)
-	w.WriteHeader(http.StatusCreated)
 }
 
-func UpdateTask(w http.ResponseWriter, r *http.Request, rep *Repository) {
+func UpdateTask(rep *Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
+	}
 }
 
-func DeleteTask(w http.ResponseWriter, r *http.Request, rep *Repository) {
+func DeleteTask(rep *Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
+	}
 }

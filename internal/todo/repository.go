@@ -14,7 +14,7 @@ func InitRepository() *Repository {
 	return &Repository{}
 }
 
-func InsertExamples(rep *Repository) {
+func (rep *Repository) InsertExamples() {
 	rep.lock.Lock()
 	defer rep.lock.RUnlock()
 	rep.tasks = append(rep.tasks,
@@ -24,13 +24,13 @@ func InsertExamples(rep *Repository) {
 	)
 }
 
-func getTasks(rep *Repository) *[]Task {
+func (rep *Repository) getTasks() *[]Task {
 	rep.lock.RLock()
 	defer rep.lock.RUnlock()
 	return &rep.tasks
 }
 
-func getTask(id int, rep *Repository) (error, *Task) {
+func (rep *Repository) getTask(id int) (error, *Task) {
 	rep.lock.RLock()
 	defer rep.lock.RUnlock()
 	for _, v := range rep.tasks {
@@ -41,16 +41,16 @@ func getTask(id int, rep *Repository) (error, *Task) {
 	return errors.New("There is no Task with the id specified"), nil
 }
 
-func addTask(task Task, rep *Repository) {
+func (rep *Repository) addTask(task Task) {
 	rep.lock.Lock()
 	defer rep.lock.Unlock()
 	rep.tasks = append(rep.tasks, task)
 }
 
-func updateTask(id int, rep *Repository) error {
+func (rep *Repository) updateTask(id int) error {
 	return nil
 }
 
-func deleteTask(id int, rep *Repository) error {
+func (rep *Repository) deleteTask(id int) error {
 	return nil
 }

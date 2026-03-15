@@ -12,7 +12,7 @@ func main() {
 	rep := todo.InitRepository()
 
 	mux := setRouter(rep)
-	todo.InsertExamples(rep)
+	rep.InsertExamples()
 
 	srv := &http.Server{
 		Addr:         ":8080",
